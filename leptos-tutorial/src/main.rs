@@ -7,6 +7,7 @@ fn main() {
 #[component]
 fn App(cx: Scope) -> impl IntoView {
     let (count, set_count) = create_signal(cx, 0);
+    let double_count = move || count() * 2;
 
     let (x, set_x) = create_signal(cx, 0);
     let (y, set_y) = create_signal(cx, 0);
@@ -34,14 +35,27 @@ fn App(cx: Scope) -> impl IntoView {
             "Moves when coordinates change"
         </div>
         <br/>
-        <progress
-            max="50"
-            value=count
-        />
+        <ProgressBar max=50 progress=count/>
         <br/>
+        <ProgressBar progress=Signal::derive(cx, double_count)/>
+    }
+}
+
+/// Shows progress towards a goal.
+#[component]
+fn ProgressBar(
+    cx: Scope,
+    /// The maximum value of the progress bar.
+    #[prop(default = 100)]
+    max: u16,
+    /// How much progress should be displayed.
+    #[prop(into)]
+    progress: Signal<i32>
+) -> impl IntoView {
+    view! { cx,
         <progress
-            max="50"
-            value=move || count() * 2
+            max=max
+            value=progress
         />
     }
 }
